@@ -10,14 +10,13 @@ namespace Conference.Data.Repositories
 {
     public interface ISpeakerRepository
     {
-        void AddSpeaker(Speaker speaker);
+        Speaker AddSpeaker(Speaker speaker);
         bool SpeakerExists(int speakerId);
-        void DeleteSpeaker(Speaker speaker);
+        bool DeleteSpeaker(Speaker speaker);
         Speaker GetSpeaker(int speakerId);
-        IEnumerable<Speaker> GetSpeakers();
-        IEnumerable<Speaker> GetSpeakers(IEnumerable<int> speakerIds);
-        void UpdateSpeaker(Speaker speaker);
-        bool Save();
+        IQueryable<Speaker> GetSpeakers();
+        IQueryable<Speaker> GetSpeakers(IEnumerable<int> speakerIds);
+        bool UpdateSpeaker(Speaker speaker);
     }
 
     public class SpeakerRepository : ISpeakerRepository
@@ -30,9 +29,11 @@ namespace Conference.Data.Repositories
         }
 
 
-        public void AddSpeaker(Speaker speaker)
+        public Speaker AddSpeaker(Speaker speaker)
         {
-            context.Speakers.Add(speaker);
+            var added = context.Speakers.Add(speaker);
+            context.SaveChanges();
+            return added.Entity;
         }
 
         public bool SpeakerExists(int speakerId)
@@ -40,14 +41,16 @@ namespace Conference.Data.Repositories
             return context.Speakers.Any(a => a.Id == speakerId);
         }
 
-        public void DeleteSpeaker(Speaker speaker)
+        public bool DeleteSpeaker(Speaker speaker)
         {
             if (speaker == null)
             {
                 throw new ArgumentNullException(nameof(speaker));
             }
 
-            context.Speakers.Remove(speaker);
+            var deleted = context.Speakers.Remove(speaker);
+            context.SaveChanges();
+            return deleted.Entity != null;
         }
 
         public Speaker GetSpeaker(int speakerId)
@@ -60,47 +63,29 @@ namespace Conference.Data.Repositories
             return context.Speakers.FirstOrDefault(a => a.Id == speakerId);
         }
 
-        public IEnumerable<Speaker> GetSpeakers()
+        public IQueryable<Speaker> GetSpeakers()
         {
-            return context.Speakers.ToList();
+            return context.Speakers;
         }
 
-        public IEnumerable<Speaker> GetSpeakers(IEnumerable<int> speakerIds)
+        public IQueryable<Speaker> GetSpeakers(IEnumerable<int> speakerIds)
         {
             if (speakerIds == null)
             {
                 throw new ArgumentNullException(nameof(speakerIds));
             }
-
+            //can be a full SQL query
             return context.Speakers.Where(a => speakerIds.Contains(a.Id))
                 .OrderBy(a => a.FirstName)
-                .ThenBy(a => a.LastName)
-                .ToList();
+                .ThenBy(a => a.LastName);
         }
 
-        public void UpdateSpeaker(Speaker speaker)
+        public bool UpdateSpeaker(Speaker speaker)
         {
-            // no code in this implementation
+            var updatedSpeaker = context.Speakers.Update(speaker);
+            context.SaveChanges();
+            return updatedSpeaker != null;
         }
 
-
-        public bool Save()
-        {
-            return (context.SaveChanges() >= 0);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // dispose resources when needed
-            }
-        }
     }
 }
