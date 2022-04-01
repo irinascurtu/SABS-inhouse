@@ -2,6 +2,7 @@ using Conference.Api.Infrastructure;
 using Conference.Api.Infrastructure.MappingProfiles;
 using Conference.Data.Repositories;
 using Conference.Domain;
+using Conference.Service;
 using Core.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,7 +33,17 @@ namespace Conference.Api
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers(options =>
+            {
+                options.RespectBrowserAcceptHeader = true;
+                options.ReturnHttpNotAcceptable = true;
+            })
+            .AddNewtonsoftJson(options =>
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore)
+            .AddXmlDataContractSerializerFormatters()
+            .AddXmlSerializerFormatters();
+
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Conference.Api", Version = "v1" });
@@ -47,7 +58,11 @@ namespace Conference.Api
             services.AddAutoMapper(typeof(TalkProfile));
 
             services.AddScoped<ISpeakerRepository, SpeakerRepository>();
+            services.AddScoped<ISpeakerService, SpeakersService>();
+
             services.AddScoped<ITalkRepository, TalkRepository>();
+
+
 
         }
 
@@ -67,7 +82,7 @@ namespace Conference.Api
 
             }
 
-           
+
 
             app.UseRouting();
 

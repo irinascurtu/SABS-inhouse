@@ -7,12 +7,14 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="11.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.15" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Conference.Data\Conference.Data.csproj" />
     <ProjectReference Include="..\Conference.Domain\Conference.Domain.csproj" />
+    <ProjectReference Include="..\Conference.Service\Conference.Service.csproj" />
   </ItemGroup>
 
 </Project>

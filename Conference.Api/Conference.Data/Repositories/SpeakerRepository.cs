@@ -65,7 +65,7 @@ namespace Conference.Data.Repositories
 
         public IQueryable<Speaker> GetSpeakers()
         {
-            return context.Speakers;
+            return context.Speakers.Include(x => x.Talks);
         }
 
         public IQueryable<Speaker> GetSpeakers(IEnumerable<int> speakerIds)
